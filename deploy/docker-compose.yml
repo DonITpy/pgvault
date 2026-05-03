@@ -1,0 +1,24 @@
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: pgvault-backend
+    restart: unless-stopped
+    environment:
+      PG_HOST: host.docker.internal
+      PG_PORT: 5433
+      PG_DATABASE: fintechdb
+      PG_USER: fintech_user
+      PG_PASSWORD: fintech_pass
+      LOG_LEVEL: info
+    ports:
+      - "8000:8000"
+    command: >
+      sh -c "uvicorn app.main:app --host 0.0.0.0 --port 8000"
+
+networks:
+  default:
+    name: pgvault_net
