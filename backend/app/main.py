@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from app.db.connection import get_pg_connection
+from app.modules.pii.service import run_pii_audit
 
 app = FastAPI()
 
@@ -14,3 +15,9 @@ def db_info():
             cur.execute("SELECT current_database(), current_user;")
             db, user = cur.fetchone()
     return {"database": db, "user": user}
+
+@app.get("/audit/pii")
+def audit_pii():
+    with get_pg_connection() as conn:
+        hallazgos = run_pii_audit(conn)
+    return {"total_hallazgos": len(hallazgos), "hallazgos": hallazgos}
