@@ -1,5 +1,5 @@
 from typing import List, Dict
-from psycopo import Connection
+from psycopg import Connection
 
 def run_config_audit(conn: Connection) -> List[Dict]:
     findings: List[Dict] = []
