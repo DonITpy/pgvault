@@ -1,6 +1,7 @@
 import re
 from .rules import COLUMN_PATTERNS, CONTENT_PATTERNS
 
+
 def detect_pii_metadata(db_connection):
     cursor = db_connection.cursor()
     query = """
@@ -13,7 +14,7 @@ def detect_pii_metadata(db_connection):
     cursor.execute(query)
     columns = cursor.fetchall()
     findings = []
-    
+
     for table_name, column_name in columns:
         for rule_name, pattern in COLUMN_PATTERNS.items():
             if re.search(pattern, column_name):
@@ -29,6 +30,7 @@ def detect_pii_metadata(db_connection):
     cursor.close()
     return findings
 
+
 def get_text_columns(db_cursor):
     query = """
     SELECT c.relname, a.attname
@@ -41,6 +43,7 @@ def get_text_columns(db_cursor):
     """
     db_cursor.execute(query)
     return db_cursor.fetchall()
+
 
 def fetch_sample_data(db_cursor, table_name, column_name, sample_size=385):
     query = f"""
@@ -55,10 +58,12 @@ def fetch_sample_data(db_cursor, table_name, column_name, sample_size=385):
     except Exception:
         return []
 
+
 def analyze_sample(sample_data, table_name, column_name):
     findings = []
     total_rows = len(sample_data)
-    if total_rows == 0: return findings
+    if total_rows == 0:
+        return findings
 
     match_counts = {rule: 0 for rule in CONTENT_PATTERNS}
     for value in sample_data:
@@ -69,7 +74,7 @@ def analyze_sample(sample_data, table_name, column_name):
 
     for rule_name, count in match_counts.items():
         match_percentage = count / total_rows
-        if match_percentage > 0.15: 
+        if match_percentage > 0.15:
             findings.append({
                 "modulo": "PII",
                 "tabla": table_name,
@@ -82,19 +87,21 @@ def analyze_sample(sample_data, table_name, column_name):
             })
     return findings
 
+
 def detect_pii_content(db_connection):
     cursor = db_connection.cursor()
     text_columns = get_text_columns(cursor)
     all_findings = []
-    
+
     for table_name, column_name in text_columns:
         sample = fetch_sample_data(cursor, table_name, column_name)
         if sample:
             col_findings = analyze_sample(sample, table_name, column_name)
             all_findings.extend(col_findings)
-            
+
     cursor.close()
     return all_findings
+
 
 def run_pii_audit(db_connection):
     metadata_findings = detect_pii_metadata(db_connection)

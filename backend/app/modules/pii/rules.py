@@ -11,7 +11,7 @@ COLUMN_PATTERNS = {
 }
 
 CONTENT_PATTERNS = {
-    'PII_RFC_DATA': re.compile(r'^[A-ZÑ&]{3,4}\d{6}[A-V1-9][A-Z1-9][0-9A]$', re.IGNORECASE),
-    'PII_EMAIL_DATA': re.compile(r'^[\w\.-]+@[\w\.-]+\.\w+$'),
-    'PCI_TARJETA_DATA': re.compile(r'^\d{13,19}$')
+    'PII_RFC_DATA': re.compile(r'^[A-ZÑ&]{3,4}\\d{6}[A-V1-9][A-Z1-9][0-9A]$', re.IGNORECASE),
+    'PII_EMAIL_DATA': re.compile(r'^[\\w\\.-]+@[\\w\\.-]+\\.\\w+$'),
+    'PCI_TARJETA_DATA': re.compile(r'^\\d{13,19}$')
 }
