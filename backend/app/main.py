@@ -4,6 +4,7 @@ from app.db.connection import get_pg_connection
 from app.modules.config_audit.service import run_config_audit
 from app.modules.pii.service import run_pii_audit
 from app.models.findings import Finding
+from app.services.scoring import calculate_security_score
 
 app = FastAPI()
 
@@ -25,12 +26,22 @@ def db_info():
 def normalize_config_findings(raw: List[dict]) -> List[Finding]:
     normalized: List[Finding] = []
     for f in raw:
+        sev = f.get("severity", "medium")
+        risk = "Medio"
+
+        if sev == "high":
+            risk = "Alto"
+        elif sev == "critical":
+            risk = "Crítico"
+        elif sev == "low":
+            risk = "Bajo"
+
         normalized.append(
             Finding(
                 module="config",
                 rule_id=f.get("id", "CONF_UNKNOWN"),
-                risk="Alto" if f.get("severity") == "high" else "Medio",
-                confidence=80,
+                risk=risk,
+                confidence=85,
                 match_type="Configuración",
                 table=None,
                 column=None,
@@ -78,5 +89,11 @@ def scan_flat():
 
     config_norm = normalize_config_findings(config_raw)
     pii_norm = normalize_pii_findings(pii_raw)
+    findings = config_norm + pii_norm
+    score_data = calculate_security_score(findings)
 
-    return {"findings": config_norm + pii_norm}
+    return {
+        "score": score_data["score"],
+        "summary": score_data["summary"],
+        "findings": findings,
+    }
