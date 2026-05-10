@@ -1,4 +1,4 @@
-import re
+import re 
 
 COLUMN_PATTERNS = {
     'PII_RFC': r'(?i).*(rfc|tax_id).*',
