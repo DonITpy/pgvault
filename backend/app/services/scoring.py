@@ -1,4 +1,5 @@
 from typing import List, Dict
+import math
 
 
 SEVERITY_POINTS = {
@@ -16,13 +17,15 @@ def calculate_security_score(findings: List[Dict]) -> Dict:
         risk = f.get("risk", "Medio")
         total_penalty += SEVERITY_POINTS.get(risk, 8)
 
-    base_score = 100
-    final_score = max(0, base_score - total_penalty)
+    if total_penalty == 0:
+        final_score = 100
+    else:
+        final_score = max(0, round(100 - (math.log1p(total_penalty) / math.log1p(400)) * 100))
 
-    critical = len([f for f in findings if f.get("risk") == "Crítico"])
-    high = len([f for f in findings if f.get("risk") == "Alto"])
-    medium = len([f for f in findings if f.get("risk") == "Medio"])
-    low = len([f for f in findings if f.get("risk") == "Bajo"])
+    critical = sum(1 for f in findings if f.get("risk") == "Crítico")
+    high = sum(1 for f in findings if f.get("risk") == "Alto")
+    medium = sum(1 for f in findings if f.get("risk") == "Medio")
+    low = sum(1 for f in findings if f.get("risk") == "Bajo")
 
     return {
         "score": final_score,
