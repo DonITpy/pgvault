@@ -1,10 +1,11 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 from typing import List
 from app.db.connection import get_pg_connection
 from app.modules.config_audit.service import run_config_audit
 from app.modules.pii.service import run_pii_audit
 from app.models.findings import Finding
 from app.services.scoring import calculate_security_score
+from app.reports.html import build_html_report
 
 app = FastAPI()
 
@@ -97,3 +98,29 @@ def scan_flat():
         "summary": score_data["summary"],
         "findings": findings,
     }
+
+
+@app.get("/report/pdf")
+def report_pdf():
+    with get_pg_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT current_database();")
+            db_name = cur.fetchone()[0]
+
+        config_raw = run_config_audit(conn)
+        pii_raw = run_pii_audit(conn)
+
+    config_norm = normalize_config_findings(config_raw)
+    pii_norm = normalize_pii_findings(pii_raw)
+    findings = config_norm + pii_norm
+    score_data = calculate_security_score(findings)
+
+    html = build_html_report(db_name, score_data["score"], score_data["summary"], findings)
+
+    return Response(
+        content=html,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f'attachment; filename="pgvault-report-{db_name}.pdf"'
+        },
+    )
