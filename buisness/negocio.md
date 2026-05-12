@@ -8,8 +8,8 @@ Cuando llega una auditoría regulatoria de la CNBV o se presenta una investigaci
 
 ## 2. Problema - 2.2 User persona principal
 
-| Atributo                  | Valor                                                                 |
-|---------------------------|-----------------------------------------------------------------------|
+| Atributo                  | Valor                                                                |
+|---------------------------|----------------------------------------------------------------------|
 | Nombre y rol              | Carlos Méndez, CISO en fintech mexicana                              |
 | Edad y experiencia        | 35 años, 10 años en seguridad de la información                      |
 | Tamaño de empresa         | 40 empleados, 2 equipos de desarrollo y 1 equipo de operaciones      |
@@ -116,3 +116,30 @@ Es defendible en el tiempo porque no depende únicamente del precio ni de una fe
 - Hallazgos pensados para PostgreSQL en vez de un enfoque genérico de data governance.
 - Reportes orientados a conversaciones con equipos de seguridad y compliance en México.
 - Adopción más simple para equipos medianos que no pueden pasar por compras enterprise complejas.
+
+## 8. Por qué nuestro equipo
+
+Nuestro equipo combina perfiles con experiencia en backend, seguridad, frontend y producto, lo que permitió construir un MVP funcional end-to-end en tres semanas. Además de implementar detectores sobre catálogos de Postgres y un dashboard operativo, trabajamos un documento de negocio enfocado en el contexto regulatorio mexicano y en las necesidades reales de fintechs con PostgreSQL en producción.
+
+## 9. Roadmap técnico post-MVP
+
+Próximos 3 meses:
+- Reemplazar el reporte HTML por generación de PDF real con plantillas ejecutiva y técnica.
+- Añadir mapeo regulatorio directo en cada hallazgo (LFPDPPP, CNBV, PCI-DSS).
+- Implementar almacenamiento de snapshots históricos para comparar runs.
+
+Próximos 6 meses:
+- Soportar múltiples instancias de PostgreSQL por cliente con vista consolidada de riesgos.
+- Incorporar más reglas de configuración y privilegios basadas en benchmarks como CIS.
+- Afinar heurísticas de PII para reducir falsos positivos usando métricas de uso real.
+
+Visión a 1 año:
+- Convertir PgVault en una plataforma de monitoreo continuo de seguridad para PostgreSQL en fintechs LATAM, con integraciones hacia herramientas de ticketing y flujos de remediación.
+
+## 10. Preguntas de QA Battle que esperamos
+
+- ¿Cómo justifican el tamaño de muestra y los patrones usados para detectar PII por contenido?
+- ¿Qué pasaría con el performance de PgVault si la base del cliente tiene millones de filas en varias tablas?
+- ¿Cómo evitarían falsos positivos masivos cuando se agregan nuevas reglas de detección?
+- Si un cliente ya usa una herramienta enterprise como BigID, ¿en qué escenarios tendría sentido además usar PgVault?
+- ¿Qué cambios harían primero si quisieran soportar un segundo motor de base de datos además de PostgreSQL?
