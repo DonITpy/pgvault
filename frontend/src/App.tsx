@@ -28,7 +28,6 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [riskFilter, setRiskFilter] = useState("Todos");
   const [moduleFilter, setModuleFilter] = useState("Todos");
-  const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
     fetch(import.meta.env.VITE_API_URL + "/scan/flat")
@@ -53,25 +52,24 @@ function App() {
     });
   }, [data, riskFilter, moduleFilter]);
 
-  const handleDownloadReport = () => {
-    setDownloading(true);
-    fetch(import.meta.env.VITE_API_URL + "/report/pdf")
-      .then((res) => res.blob())
-      .then((blob) => {
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "pgvault-report.pdf";
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        window.URL.revokeObjectURL(url);
-        setDownloading(false);
-      })
-      .catch((err) => {
-        console.error(err);
-        setDownloading(false);
-      });
+  const handleDownloadReport = async () => {
+    try {
+      const response = await fetch(import.meta.env.VITE_API_URL + "/report/pdf");
+      if (!response.ok) throw new Error("Error descargando el reporte");
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `pgvault-report-${new Date().toISOString().split('T')[0]}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error al descargar el reporte:", error);
+      alert("No se pudo descargar el reporte");
+    }
   };
 
   if (loading) {
@@ -116,8 +114,8 @@ function App() {
           </select>
         </div>
 
-        <button onClick={handleDownloadReport} disabled={downloading}>
-          {downloading ? "Generando reporte..." : "Descargar reporte"}
+        <button onClick={handleDownloadReport}>
+          Ver reporte
         </button>
       </div>
 
