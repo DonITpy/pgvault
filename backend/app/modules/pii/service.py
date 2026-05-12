@@ -9,7 +9,14 @@ def detect_pii_metadata(db_connection):
     FROM pg_attribute a
     JOIN pg_class c ON a.attrelid = c.oid
     JOIN pg_namespace n ON c.relnamespace = n.oid
-    WHERE a.attnum > 0 AND NOT a.attisdropped AND n.nspname = 'public';
+    WHERE a.attnum > 0  
+      AND NOT a.attisdropped
+      AND n.nspname = 'public'
+      AND c.relkind IN ('r', 'p')
+      AND c.relname NOT LIKE 'dblink%'
+      AND c.relname NOT LIKE 'idx_%'
+      AND c.relname NOT LIKE '%_pkey'
+      AND c.relname NOT LIKE '%_key';
     """
     cursor.execute(query)
     columns = cursor.fetchall()
@@ -37,9 +44,11 @@ def get_text_columns(db_cursor):
     FROM pg_attribute a
     JOIN pg_class c ON a.attrelid = c.oid
     JOIN pg_namespace n ON c.relnamespace = n.oid
-    JOIN pg_type t ON a.atttypid = t.oid
-    WHERE a.attnum > 0 AND NOT a.attisdropped AND n.nspname = 'public'
-    AND t.typname IN ('varchar', 'text', 'char');
+    WHERE a.attnum > 0
+      AND NOT a.attisdropped
+      AND n.nspname = 'public'
+      AND c.relkind = 'r'
+      AND c.relname NOT LIKE 'dblink%';
     """
     db_cursor.execute(query)
     return db_cursor.fetchall()

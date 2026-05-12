@@ -1,13 +1,22 @@
 from fastapi import FastAPI, Response
+from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 from app.db.connection import get_pg_connection
 from app.modules.config_audit.service import run_config_audit
 from app.modules.pii.service import run_pii_audit
 from app.models.findings import Finding
 from app.services.scoring import calculate_security_score
-from app.reports.html import build_html_report
+from app.reports.html import build_html_report, build_pdf_report
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/health")
@@ -115,10 +124,10 @@ def report_pdf():
     findings = config_norm + pii_norm
     score_data = calculate_security_score(findings)
 
-    html = build_html_report(db_name, score_data["score"], score_data["summary"], findings)
+    pdf_bytes = build_pdf_report(db_name, score_data["score"], score_data["summary"], findings)
 
     return Response(
-        content=html,
+        content=pdf_bytes,
         media_type="application/pdf",
         headers={
             "Content-Disposition": f'attachment; filename="pgvault-report-{db_name}.pdf"'
