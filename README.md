@@ -198,3 +198,6 @@ El endpoint `GET /report/pdf` entrega un archivo descargable con el resumen y de
 ## 12. Uso de IA en el desarrollo
 
 El equipo utilizó herramientas de IA generativa para acelerar la escritura de código boilerplate, proponer estructuras de módulos y redactar secciones del documento de negocio. La lógica de detección, calibración de reglas y justificación técnica se trabajaron manualmente y se revisaron para asegurar que el equipo entiende y puede defender cada parte del producto en el Demo Day.
+
+## 13. Video Demo
+https://youtu.be/RZfD3HHQVZs
