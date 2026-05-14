@@ -151,4 +151,32 @@ def run_config_audit(conn: Connection) -> List[Dict]:
                 "remediation_sql": "Revisar search_path fijo y privilegios mínimos sobre cada función SECURITY DEFINER."
             })
 
+    # Check 9: métodos de autenticación inseguros en pg_hba
+    with conn.cursor() as cur:
+        cur.execute("""
+            SELECT type, database, user_name, address, auth_method
+            FROM pg_hba_file_rules
+            WHERE auth_method IN ('trust', 'password')
+              AND type != 'local';
+        """)
+        rows = cur.fetchall()
+        if rows:
+            findings.append({
+                "id": "CONF_HBA_INSECURE_AUTH",
+                "severity": "high",
+                "title": "Métodos de autenticación inseguros detectados en pg_hba",
+                "details": f"Se encontraron {len(rows)} reglas en pg_hba que usan métodos inseguros (trust o password en claro) para conexiones de red.",
+                "evidence": [
+                    {
+                        "type": r[0],
+                        "database": r[1],
+                        "user": r[2],
+                        "address": r[3],
+                        "auth_method": r[4]
+                    }
+                    for r in rows
+                ],
+                "remediation_sql": "Cambiar el método de autenticación a scram-sha-256 en pg_hba.conf para todas las conexiones de red."
+            })
+
     return findings
