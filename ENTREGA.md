@@ -17,7 +17,7 @@
 |---|---|
 | Nombre del proyecto | PgVault |
 | Nombre del equipo | SecureBase |
-| Slogan | Detecta riesgos en PostgreSQL antes de que llegue el auditor |
+| Slogan | Convierte tu PostgreSQL en una fortaleza |
 
 ## Miembros del equipo
 
@@ -37,6 +37,9 @@
 | Video demo (3-5 min) | https://youtu.be/RZfD3HHQVZs |
 | Landing page | No aplica — producto académico sin despliegue público |
 | Producto desplegado | No aplica — se levanta localmente con Docker Compose |
+| Entrevista 1 | https://youtu.be/wQhv6wdG2wE |
+| Entrevista 2 | https://youtu.be/xEkWXpwd7m0 |
+| Entrevista 3 | https://youtu.be/WPzwlWb8blU |
 
 ## Resumen ejecutivo
 
